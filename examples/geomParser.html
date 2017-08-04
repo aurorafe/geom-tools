@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>geomParser</title>
+</head>
+<body>
+<script src="../dist/GeomTools.js"></script>
+<script type="text/javascript">
+  var parser = new GeomTools()
+  var res = parser.wkt2GeoJSON('LINESTRING (30 10, 10 30, 40 40)')
+  var coord = parser.wkt2ArraySource('LINESTRING (30 10, 10 30, 40 40)')
+  var _coord = parser.wkt2ArrayFix('LINESTRING (30 10, 10 30, 40 40)')
+  console.log(res, coord, _coord)
+
+  var _res = parser.wkt2GeoJSON('LINESTRING M (30 10 10, 10 30 20, 40 40 30)')
+  var __coord = parser.wkt2ArraySource('LINESTRING M (30 10 10, 10 30 20, 40 40 30)')
+  var ___coord = parser.wkt2ArrayFix('LINESTRING M (30 10 10, 10 30 20, 40 40 30)')
+
+  console.log(_res, __coord, ___coord)
+</script>
+</body>
+</html>
