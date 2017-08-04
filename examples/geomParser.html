@@ -18,6 +18,10 @@
   var ___coord = parser.wkt2ArrayFix('LINESTRING M (30 10 10, 10 30 20, 40 40 30)')
 
   console.log(_res, __coord, ___coord)
+
+  var _wkt = parser.geoJSON2Wkt(res)
+  var __wkt = parser.geoJSON2Wkt(_res)
+  console.log(_wkt, __wkt)
 </script>
 </body>
 </html>

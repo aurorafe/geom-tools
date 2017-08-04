@@ -48,6 +48,49 @@ class GeomParser {
       console.info(error)
     }
   }
+
+  /**
+   * GeoJSON转换为WKT
+   * @param geometry
+   * @returns {*}
+   */
+  geoJSON2Wkt (geometry) {
+    try {
+      return terraformerWktParser.convert(geometry)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  /**
+   * 转换空间数据数组（保持结构不变）
+   * @param geometry
+   * @returns {*}
+   */
+  geoJSON2ArraySource (geometry) {
+    try {
+      if (geometry.hasOwnProperty('coordinates') && geometry['coordinates'] && Array.isArray(geometry['coordinates'])) {
+        return geometry['coordinates']
+      } else {
+        throw Error('转换出错！')
+      }
+    } catch (e) {
+      console.info(e)
+    }
+  }
+
+  /**
+   * 合并后的多点多线多面数据
+   * @param geometry
+   */
+  geoJSON2ArrayFix (geometry) {
+    try {
+      let coordinates = this.geoJSON2ArraySource(geometry)
+      return (utils.corverRecurrence(coordinates))
+    } catch (error) {
+      console.info(error)
+    }
+  }
 }
 
 export default GeomParser

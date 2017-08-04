@@ -162,6 +162,38 @@ var GeomParser = function () {
         console.info(error);
       }
     }
+  }, {
+    key: 'geoJSON2Wkt',
+    value: function geoJSON2Wkt(geometry) {
+      try {
+        return _terraformerWktParser2.default.convert(geometry);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }, {
+    key: 'geoJSON2ArraySource',
+    value: function geoJSON2ArraySource(geometry) {
+      try {
+        if (geometry.hasOwnProperty('coordinates') && geometry['coordinates'] && Array.isArray(geometry['coordinates'])) {
+          return geometry['coordinates'];
+        } else {
+          throw Error('转换出错！');
+        }
+      } catch (e) {
+        console.info(e);
+      }
+    }
+  }, {
+    key: 'geoJSON2ArrayFix',
+    value: function geoJSON2ArrayFix(geometry) {
+      try {
+        var coordinates = this.geoJSON2ArraySource(geometry);
+        return utils.corverRecurrence(coordinates);
+      } catch (error) {
+        console.info(error);
+      }
+    }
   }]);
 
   return GeomParser;
