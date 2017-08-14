@@ -2,6 +2,7 @@
  * Created by FDD on 2017/8/4.
  */
 import {factors} from '../constants'
+
 /**
  * 递归（注意防止内存溢出，多层数据）
  * @param data
@@ -9,7 +10,8 @@ import {factors} from '../constants'
  */
 export const corverRecurrence = (data) => {
   let _data = []
-  function recurrence (items) {
+
+  function recurrence(items) {
     if (items && Array.isArray(items) && items.length > 0) {
       items.forEach(function (item) {
         if (item && Array.isArray(item) && item.length > 0) {
@@ -20,6 +22,7 @@ export const corverRecurrence = (data) => {
       })
     }
   }
+
   recurrence(data)
   return _data
 }
@@ -38,9 +41,9 @@ export const closeDisorderArray = (arr, num, params) => {
       if (Array.isArray(arr[0]) && typeof params === 'number') {
         ret = arr[0][params]
         let distance = Math.abs(ret - num)
-        for(let i = 1; i < arr.length; i++){
+        for (let i = 1; i < arr.length; i++) {
           let newDistance = Math.abs(arr[i][params] - num)
-          if(newDistance < distance){
+          if (newDistance < distance) {
             distance = newDistance
             ret = arr[i][params]
             res_ = arr[i]
@@ -49,9 +52,9 @@ export const closeDisorderArray = (arr, num, params) => {
       } else if (typeof arr[0] === 'object' && typeof params === 'string') {
         ret = arr[0][params]
         let distance = Math.abs(ret - num)
-        for(let i = 1; i < arr.length; i++){
+        for (let i = 1; i < arr.length; i++) {
           let newDistance = Math.abs(arr[i][params] - num)
-          if(newDistance < distance){
+          if (newDistance < distance) {
             distance = newDistance
             ret = arr[i][params]
             res_ = arr[i]
@@ -60,9 +63,9 @@ export const closeDisorderArray = (arr, num, params) => {
       } else if (typeof arr[0] === 'number') {
         ret = arr[0]
         let distance = Math.abs(ret - num)
-        for(let i = 1; i < arr.length; i++){
+        for (let i = 1; i < arr.length; i++) {
           let newDistance = Math.abs(arr[i] - num)
-          if(newDistance < distance){
+          if (newDistance < distance) {
             distance = newDistance
             ret = arr[i]
             res_ = arr[i]
@@ -223,4 +226,46 @@ export const radiansToDistance = (radians, units) => {
   let factor = factors[units || 'kilometers']
   if (!factor) throw new Error('单位错误！')
   return radians * factor
+}
+
+/**
+ * destination
+ * @param origin
+ * @param distance
+ * @param bearing
+ * @param units
+ * @returns {*}
+ */
+export const destination = (origin, distance, bearing, units) => {
+  let [degrees2radians, radians2degrees] = [(Math.PI / 180), (180 / Math.PI)]
+  let coordinates1 = getCoord(origin)
+  let [longitude1, latitude1] = [(degrees2radians * coordinates1[0]),
+    (degrees2radians * coordinates1[1])]
+  let bearingRad = degrees2radians * bearing
+  let radians = distanceToRadians(distance, units)
+  let latitude2 = Math.asin(Math.sin(latitude1) * Math.cos(radians) +
+    Math.cos(latitude1) * Math.sin(radians) * Math.cos(bearingRad))
+  let longitude2 = longitude1 +
+    Math.atan2(Math.sin(bearingRad) *
+    Math.sin(radians) * Math.cos(latitude1),
+    Math.cos(radians) - Math.sin(latitude1) * Math.sin(latitude2))
+
+  return point([radians2degrees * longitude2, radians2degrees * latitude2])
+}
+
+/**
+ * 距离转弧度
+ * @param distance
+ * @param units
+ * @returns {number}
+ */
+export const distanceToRadians = (distance, units) => {
+  if (distance === undefined || distance === null) {
+    throw new Error('距离必须传入！')
+  }
+  let factor = factors[units || 'kilometers']
+  if (!factor) {
+    throw new Error('单位错误！')
+  }
+  return distance / factor
 }

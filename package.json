@@ -20,6 +20,7 @@
     "url": "https://github.com/sakitam-fdd/ImagesPano.git"
   },
   "dependencies": {
+    "@turf/turf": "^4.6.1",
     "terraformer-wkt-parser": "^1.1.2"
   },
   "devDependencies": {

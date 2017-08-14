@@ -3,6 +3,7 @@
  * @desc 线性参考，包含坐标转桩号和桩号转坐标
  */
 import * as utils from '../utils/utils'
+import ''
 class LrsUtils {
   /**
    * 从线中获取最近的点
@@ -25,15 +26,15 @@ class LrsUtils {
       flattenEach(lines, function (line) {
         let coords = utils.getCoords(line)
         for (let i = 0; i < coords.length - 1; i++) {
-          //start
+          // start
           let start = point(coords[i])
           start.properties.dist = utils.distance(point, start, units)
-          //stop
+          // stop
           let stop = point(coords[i + 1])
           stop.properties.dist = utils.distance(point, stop, units)
           // sectionLength
           let sectionLength = utils.distance(start, stop, units)
-          //perpendicular
+          // perpendicular
           var heightDistance = Math.max(start.properties.dist, stop.properties.dist)
           var direction = bearing(start, stop)
           var perpendicularPt1 = destination(point, heightDistance, direction + 90, units)
@@ -70,3 +71,5 @@ class LrsUtils {
     }
   }
 }
+
+export default LrsUtils
