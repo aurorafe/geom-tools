@@ -3,8 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <title>geomParser</title>
+  <style type="text/css">
+    .base-textarea {
+      font-size: 10pt;
+      font-family: 'Microsoft Yahei';
+      line-height: normal !important;
+      overflow: auto;
+      vertical-align: top;
+      outline: none;
+      resize: both;
+      height: 200px;
+    }
+  </style>
 </head>
 <body>
+<textarea class="base-textarea left-textarea" id="code"></textarea>
+<textarea class="base-textarea right-textarea" id="encode"></textarea>
 <script src="../dist/GeomTools.js"></script>
 <script type="text/javascript">
   var parser = new GeomTools()
