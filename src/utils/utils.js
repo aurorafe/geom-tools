@@ -1,7 +1,7 @@
 /**
  * Created by FDD on 2017/8/4.
  */
-
+import {factors} from '../constants'
 /**
  * 递归（注意防止内存溢出，多层数据）
  * @param data
@@ -82,6 +82,7 @@ export const closeDisorderArray = (arr, num, params) => {
  * 有序列表查
  * @param arr
  * @param num
+ * @param params
  * @returns {*}
  */
 export const closeOrderArray = (arr, num, params) => {
@@ -130,4 +131,96 @@ export const closeOrderArray = (arr, num, params) => {
   } catch (error) {
     console.log(error)
   }
+}
+
+/**
+ * 计算距离
+ * @param from
+ * @param to
+ * @param units
+ * @returns {number}
+ */
+export const distance = (from, to, units) => {
+  var degrees2radians = Math.PI / 180
+  var coordinates1 = getCoord(from)
+  var coordinates2 = getCoord(to)
+  var dLat = degrees2radians * (coordinates2[1] - coordinates1[1])
+  var dLon = degrees2radians * (coordinates2[0] - coordinates1[0])
+  var lat1 = degrees2radians * coordinates1[1]
+  var lat2 = degrees2radians * coordinates2[1]
+  var a = Math.pow(Math.sin(dLat / 2), 2) +
+    Math.pow(Math.sin(dLon / 2), 2) * Math.cos(lat1) * Math.cos(lat2)
+  return radiansToDistance(2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)), units)
+}
+
+/**
+ * 获取坐标
+ * @param obj
+ */
+export const getCoord = (obj) => {
+  if (!obj) throw new Error('obj is required')
+  let coordinates = getCoords(obj)
+  if (coordinates.length > 1 &&
+    typeof coordinates[0] === 'number' &&
+    typeof coordinates[1] === 'number') {
+    return coordinates;
+  } else {
+    throw new Error('Coordinate is not a valid Point')
+  }
+}
+
+/**
+ * 获取坐标列表
+ * @param obj
+ * @returns {*}
+ */
+export const getCoords = (obj) => {
+  if (!obj) throw new Error('obj is required')
+  let coordinates
+  // Array of numbers
+  if (obj.length) {
+    coordinates = obj
+    // Geometry Object
+  } else if (obj.coordinates) {
+    coordinates = obj.coordinates
+    // Feature
+  } else if (obj.geometry && obj.geometry.coordinates) {
+    coordinates = obj.geometry.coordinates
+  }
+  // Checks if coordinates contains a number
+  if (coordinates) {
+    containsNumber(coordinates)
+    return coordinates
+  }
+  throw new Error('No valid coordinates')
+}
+
+/**
+ * contains
+ * @param coordinates
+ * @returns {boolean}
+ */
+export const containsNumber = (coordinates) => {
+  if (coordinates.length > 1 &&
+    typeof coordinates[0] === 'number' &&
+    typeof coordinates[1] === 'number') {
+    return true
+  }
+  if (Array.isArray(coordinates[0]) && coordinates[0].length) {
+    return containsNumber(coordinates[0])
+  }
+  throw new Error('coordinates must only contain numbers')
+}
+
+/**
+ * 弧度转距离
+ * @param radians
+ * @param units
+ * @returns {number}
+ */
+export const radiansToDistance = (radians, units) => {
+  if (radians === undefined || radians === null) throw new Error('参数错误')
+  let factor = factors[units || 'kilometers']
+  if (!factor) throw new Error('单位错误！')
+  return radians * factor
 }
