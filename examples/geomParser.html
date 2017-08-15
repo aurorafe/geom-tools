@@ -21,7 +21,7 @@
 <textarea class="base-textarea right-textarea" id="encode"></textarea>
 <script src="../dist/GeomTools.js"></script>
 <script type="text/javascript">
-  var parser = new GeomTools()
+  var parser = new GeomTools.GeomParser()
   var res = parser.wkt2GeoJSON('LINESTRING (30 10, 10 30, 40 40)')
   var coord = parser.wkt2ArraySource('LINESTRING (30 10, 10 30, 40 40)')
   var _coord = parser.wkt2ArrayFix('LINESTRING (30 10, 10 30, 40 40)')

@@ -2,7 +2,7 @@
  * Created by FDD on 2017/8/4.
  */
 import {factors} from '../constants'
-
+import { feature, point } from './geometry'
 /**
  * 递归（注意防止内存溢出，多层数据）
  * @param data
@@ -10,8 +10,7 @@ import {factors} from '../constants'
  */
 export const corverRecurrence = (data) => {
   let _data = []
-
-  function recurrence(items) {
+  function recurrence (items) {
     if (items && Array.isArray(items) && items.length > 0) {
       items.forEach(function (item) {
         if (item && Array.isArray(item) && item.length > 0) {
@@ -166,7 +165,7 @@ export const getCoord = (obj) => {
   if (coordinates.length > 1 &&
     typeof coordinates[0] === 'number' &&
     typeof coordinates[1] === 'number') {
-    return coordinates;
+    return coordinates
   } else {
     throw new Error('Coordinate is not a valid Point')
   }
@@ -247,9 +246,8 @@ export const destination = (origin, distance, bearing, units) => {
     Math.cos(latitude1) * Math.sin(radians) * Math.cos(bearingRad))
   let longitude2 = longitude1 +
     Math.atan2(Math.sin(bearingRad) *
-    Math.sin(radians) * Math.cos(latitude1),
-    Math.cos(radians) - Math.sin(latitude1) * Math.sin(latitude2))
-
+      Math.sin(radians) * Math.cos(latitude1),
+      Math.cos(radians) - Math.sin(latitude1) * Math.sin(latitude2))
   return point([radians2degrees * longitude2, radians2degrees * latitude2])
 }
 
@@ -268,4 +266,110 @@ export const distanceToRadians = (distance, units) => {
     throw new Error('单位错误！')
   }
   return distance / factor
+}
+
+/**
+ * flattenEach<@turf/meta>
+ * @param geojson
+ * @param callback
+ */
+export const flattenEach = (geojson, callback) => {
+  geomEach(geojson, function (geometry, featureIndex, properties) {
+    // Callback for single geometry
+    var type = (geometry === null) ? null : geometry.type
+    switch (type) {
+      case null:
+      case 'Point':
+      case 'LineString':
+      case 'Polygon':
+        callback(feature(geometry, properties), featureIndex, 0)
+        return
+    }
+    var geomType
+    // Callback for multi-geometry
+    switch (type) {
+      case 'MultiPoint':
+        geomType = 'Point'
+        break
+      case 'MultiLineString':
+        geomType = 'LineString'
+        break
+      case 'MultiPolygon':
+        geomType = 'Polygon'
+        break
+    }
+    geometry.coordinates.forEach(function (coordinate, featureSubIndex) {
+      var geom = {
+        type: geomType,
+        coordinates: coordinate
+      }
+      callback(feature(geom, properties), featureIndex, featureSubIndex)
+    })
+  })
+}
+
+/**
+ * geomEach<@turf/meta>
+ * @param geojson
+ * @param callback
+ */
+export const geomEach = (geojson, callback) => {
+  /* eslint one-var: 0 */
+  var i, j, g, geometry, stopG,
+    geometryMaybeCollection,
+    isGeometryCollection,
+    geometryProperties,
+    featureIndex = 0,
+    isFeatureCollection = geojson.type === 'FeatureCollection',
+    isFeature = geojson.type === 'Feature',
+    stop = isFeatureCollection ? geojson.features.length : 1
+
+  // This logic may look a little weird. The reason why it is that way
+  // is because it's trying to be fast. GeoJSON supports multiple kinds
+  // of objects at its root: FeatureCollection, Features, Geometries.
+  // This function has the responsibility of handling all of them, and that
+  // means that some of the `for` loops you see below actually just don't apply
+  // to certain inputs. For instance, if you give this just a
+  // Point geometry, then both loops are short-circuited and all we do
+  // is gradually rename the input until it's called 'geometry'.
+  //
+  // This also aims to allocate as few resources as possible: just a
+  // few numbers and booleans, rather than any temporary arrays as would
+  // be required with the normalization approach.
+  for (i = 0; i < stop; i++) {
+    geometryMaybeCollection = (isFeatureCollection ? geojson.features[i].geometry : (isFeature ? geojson.geometry : geojson))
+    geometryProperties = (isFeatureCollection ? geojson.features[i].properties : (isFeature ? geojson.properties : {}))
+    isGeometryCollection = (geometryMaybeCollection) ? geometryMaybeCollection.type === 'GeometryCollection' : false
+    stopG = isGeometryCollection ? geometryMaybeCollection.geometries.length : 1
+    for (g = 0; g < stopG; g++) {
+      geometry = isGeometryCollection ? geometryMaybeCollection.geometries[g] : geometryMaybeCollection
+      // Handle null Geometry
+      if (geometry === null) {
+        callback(null, featureIndex, geometryProperties)
+        featureIndex++
+        continue
+      }
+      switch (geometry.type) {
+        case 'Point':
+        case 'LineString':
+        case 'MultiPoint':
+        case 'Polygon':
+        case 'MultiLineString':
+        case 'MultiPolygon': {
+          callback(geometry, featureIndex, geometryProperties)
+          featureIndex++
+          break
+        }
+        case 'GeometryCollection': {
+          for (j = 0; j < geometry.geometries.length; j++) {
+            callback(geometry.geometries[j], featureIndex, geometryProperties)
+            featureIndex++
+          }
+          break
+        }
+        default:
+          throw new Error('Unknown Geometry Type')
+      }
+    }
+  }
 }

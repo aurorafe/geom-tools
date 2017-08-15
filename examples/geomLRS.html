@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>geomParser</title>
+  <style type="text/css">
+    .base-textarea {
+      font-size: 10pt;
+      font-family: 'Microsoft Yahei';
+      line-height: normal !important;
+      overflow: auto;
+      vertical-align: top;
+      outline: none;
+      resize: both;
+      height: 200px;
+    }
+  </style>
+</head>
+<body>
+<textarea class="base-textarea left-textarea" id="code"></textarea>
+<textarea class="base-textarea right-textarea" id="encode"></textarea>
+<script src="../dist/GeomTools.js"></script>
+<script type="text/javascript">
+  var lrsUtils = new GeomTools.LrsUtils()
+  var point = lrsUtils.getPointByMileage('LINESTRING M (30 10 10, 10 30 20, 40 40 30)', 24)
+  console.log(point)
+
+  var mile = lrsUtils.getMileageByPoint('LINESTRING M (30 10 10, 10 30 20, 40 40 30)', [10, 30])
+  console.log(mile)
+</script>
+</body>
+</html>
