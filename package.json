@@ -17,7 +17,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sakitam-fdd/ImagesPano.git"
+    "url": "https://github.com/aurorafe/geom-tools.git"
   },
   "dependencies": {
     "@turf/turf": "^4.6.1",
