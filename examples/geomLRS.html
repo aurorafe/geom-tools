@@ -22,11 +22,10 @@
 <script src="../dist/GeomTools.js"></script>
 <script type="text/javascript">
   var lrsUtils = new GeomTools.LrsUtils()
-  var point = lrsUtils.getPointByMileage('LINESTRING M (30 10 10, 10 30 20, 40 40 30)', 24)
-  console.log(point)
-
-  var mile = lrsUtils.getMileageByPoint('LINESTRING M (30 10 10, 10 30 20, 40 40 30)', [10, 30])
+  var mile = lrsUtils.getMileageByPoint('MULTILINESTRING M ((115.873075148 26.383782945000007 0, 115.573075148 26.083782945000007 30, 114.573075148 25.083782945000007 60))', [115.563075148, 26.083782945000007])
   console.log(mile)
+  var point = lrsUtils.getPointByMileage('MULTILINESTRING M ((115.873075148 26.383782945000007 0, 115.573075148 26.083782945000007 30, 114.573075148 25.083782945000007 60))', 24)
+  console.log(point)
 </script>
 </body>
 </html>
