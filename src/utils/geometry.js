@@ -1,4 +1,4 @@
-function feature (geometry, properties, bbox, id) {
+export const feature = (geometry, properties, bbox, id) => {
   if (geometry === undefined) throw new Error('geometry is required')
   if (properties && properties.constructor !== Object) throw new Error('properties must be an Object')
   var feat = {
@@ -14,7 +14,7 @@ function feature (geometry, properties, bbox, id) {
   return feat
 }
 
-function geometry (type, coordinates, bbox) {
+export const geometry = (type, coordinates, bbox) => {
   // Validation
   if (!type) throw new Error('type is required')
   if (!coordinates) throw new Error('coordinates is required')
@@ -49,7 +49,7 @@ function geometry (type, coordinates, bbox) {
   return geom
 }
 
-function point (coordinates, properties, bbox, id) {
+export const point = (coordinates, properties, bbox, id) => {
   if (!coordinates) throw new Error('No coordinates passed')
   if (coordinates.length === undefined) throw new Error('Coordinates must be an array')
   if (coordinates.length < 2) throw new Error('Coordinates must be at least 2 numbers long')
@@ -60,7 +60,7 @@ function point (coordinates, properties, bbox, id) {
   }, properties, bbox, id)
 }
 
-function polygon (coordinates, properties, bbox, id) {
+export const polygon = (coordinates, properties, bbox, id) => {
   if (!coordinates) throw new Error('No coordinates passed')
   for (var i = 0; i < coordinates.length; i++) {
     var ring = coordinates[i]
@@ -79,7 +79,7 @@ function polygon (coordinates, properties, bbox, id) {
   }, properties, bbox, id)
 }
 
-function lineString (coordinates, properties, bbox, id) {
+export const lineString = (coordinates, properties, bbox, id) => {
   if (!coordinates) throw new Error('No coordinates passed')
   if (coordinates.length < 2) throw new Error('Coordinates must be an array of two or more positions')
   return feature({
@@ -88,7 +88,7 @@ function lineString (coordinates, properties, bbox, id) {
   }, properties, bbox, id)
 }
 
-function featureCollection (features, bbox) {
+export const featureCollection = (features, bbox) => {
   if (!features) throw new Error('No features passed')
   if (!Array.isArray(features)) throw new Error('features must be an Array')
   var fc = {
@@ -99,7 +99,7 @@ function featureCollection (features, bbox) {
   return fc
 }
 
-function multiLineString (coordinates, properties, bbox, id) {
+export const multiLineString = (coordinates, properties, bbox, id) => {
   if (!coordinates) throw new Error('No coordinates passed')
   return feature({
     type: 'MultiLineString',
@@ -107,7 +107,7 @@ function multiLineString (coordinates, properties, bbox, id) {
   }, properties, bbox, id)
 }
 
-function multiPoint (coordinates, properties, bbox, id) {
+export const multiPoint = (coordinates, properties, bbox, id) => {
   if (!coordinates) throw new Error('No coordinates passed')
   return feature({
     type: 'MultiPoint',
@@ -115,7 +115,7 @@ function multiPoint (coordinates, properties, bbox, id) {
   }, properties, bbox, id)
 }
 
-function multiPolygon (coordinates, properties, bbox, id) {
+export const multiPolygon = (coordinates, properties, bbox, id) => {
   if (!coordinates) throw new Error('No coordinates passed')
   return feature({
     type: 'MultiPolygon',
@@ -123,24 +123,11 @@ function multiPolygon (coordinates, properties, bbox, id) {
   }, properties, bbox, id)
 }
 
-function geometryCollection (geometries, properties, bbox, id) {
+export const geometryCollection = (geometries, properties, bbox, id) => {
   if (!geometries) throw new Error('geometries is required')
   if (!Array.isArray(geometries)) throw new Error('geometries must be an Array')
   return feature({
     type: 'GeometryCollection',
     geometries: geometries
   }, properties, bbox, id)
-}
-
-export default {
-  feature,
-  geometry,
-  point,
-  polygon,
-  lineString,
-  featureCollection,
-  multiLineString,
-  multiPoint,
-  multiPolygon,
-  geometryCollection
 }

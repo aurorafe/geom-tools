@@ -5,7 +5,8 @@
 import * as utils from '../utils/utils'
 import {bearing} from '../utils/bearing'
 import lineIntersects from '@turf/line-intersect'
-import geometryUtils from '../utils/geometry'
+import constants from '../constants'
+import * as geometryUtils from '../utils/geometry'
 import GeomParser from './GeomParser'
 class LrsUtils {
   /**
@@ -29,47 +30,94 @@ class LrsUtils {
       utils.flattenEach(lines, function (line) {
         let coords = utils.getCoords(line)
         for (let i = 0; i < coords.length - 1; i++) {
-          // start
-          let start = geometryUtils.point(coords[i])
-          start.properties.dist = utils.distance(point, start, units)
-          // stop
-          let stop = geometryUtils.point(coords[i + 1])
-          stop.properties.dist = utils.distance(point, stop, units)
-          // sectionLength
-          let sectionLength = utils.distance(start, stop, units)
-          // perpendicular
-          let heightDistance = Math.max(start.properties.dist, stop.properties.dist)
-          let direction = bearing(start, stop)
-          let perpendicularPt1 = utils.destination(point, heightDistance, direction + 90, units)
-          let perpendicularPt2 = utils.destination(point, heightDistance, direction - 90, units)
-          let intersect = lineIntersects(geometryUtils.lineString([perpendicularPt1.geometry.coordinates,
-            perpendicularPt2.geometry.coordinates]), geometryUtils.lineString([start.geometry.coordinates,
+          if (coords[i].length < 3) {
+            continue
+          } else {
+            // start
+            let start = geometryUtils.point(coords[i])
+            start.properties.dist = utils.distance(point, start, units)
+            // stop
+            let stop = geometryUtils.point(coords[i + 1])
+            stop.properties.dist = utils.distance(point, stop, units)
+            // sectionLength
+            let sectionLength = utils.distance(start, stop, units)
+            // perpendicular
+            let heightDistance = Math.max(start.properties.dist, stop.properties.dist)
+            let direction = bearing(start, stop)
+            let perpendicularPt1 = utils.destination(point, heightDistance, direction + 90, units)
+            let perpendicularPt2 = utils.destination(point, heightDistance, direction - 90, units)
+            let intersect = lineIntersects(geometryUtils.lineString([perpendicularPt1.geometry.coordinates,
+              perpendicularPt2.geometry.coordinates]), geometryUtils.lineString([start.geometry.coordinates,
               stop.geometry.coordinates]))
-          let intersectPt = null
-          if (intersect.features.length > 0) {
-            intersectPt = intersect.features[0]
-            intersectPt.properties.dist = utils.distance(point, intersectPt, units)
-            intersectPt.properties.location = length + utils.distance(start, intersectPt, units)
+            let intersectPt = null
+            if (intersect.features.length > 0) {
+              intersectPt = intersect.features[0]
+              intersectPt.properties.dist = utils.distance(point, intersectPt, units)
+              intersectPt.properties.location = length + utils.distance(start, intersectPt, units)
+            }
+            if (start.properties.dist < closestPoint.properties.dist) {
+              closestPoint = start
+              closestPoint.properties.index = i
+              closestPoint.properties.location = length
+            }
+            if (stop.properties.dist < closestPoint.properties.dist) {
+              closestPoint = stop
+              closestPoint.properties.index = i + 1
+              closestPoint.properties.location = length + sectionLength
+            }
+            if (intersectPt && intersectPt.properties.dist < closestPoint.properties.dist) {
+              closestPoint = intersectPt
+              closestPoint.properties.index = i
+            }
+            // update length
+            length += sectionLength
           }
-          if (start.properties.dist < closestPoint.properties.dist) {
-            closestPoint = start
-            closestPoint.properties.index = i
-            closestPoint.properties.location = length
-          }
-          if (stop.properties.dist < closestPoint.properties.dist) {
-            closestPoint = stop
-            closestPoint.properties.index = i + 1
-            closestPoint.properties.location = length + sectionLength
-          }
-          if (intersectPt && intersectPt.properties.dist < closestPoint.properties.dist) {
-            closestPoint = intersectPt
-            closestPoint.properties.index = i
-          }
-          // update length
-          length += sectionLength
         }
       })
       return closestPoint
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  /**
+   * 处理单独带M值的路线
+   * @param lines
+   * @param point
+   * @param epsg
+   * @returns {*}
+   */
+  getClosePointFromLinesHasM (lines, point, epsg) {
+    try {
+      let pointSnap = null
+      if (Array.isArray(lines) && lines.length > 0) {
+        // start
+        let [start, stop] = [{
+          dist: Infinity,
+          index: Infinity
+        }, {}]
+        for (let i = 0; i < lines.length - 1; i++) {
+          if (lines[i].length < 3) {
+            continue
+          } else {
+            let dist = utils.getDistance_(point, lines[i], constants['radius'])
+            stop['dist'] = dist
+            stop['coords'] = lines[i]
+            stop['index'] = i
+            function corver_ (_start, _stop) {
+              if (_start['dist'] < _stop['dist']) {
+                _start = JSON.stringify(_start)
+              } else {
+                _start = JSON.stringify(_stop)
+              }
+              return JSON.parse(_start)
+            }
+            start = corver_(start, stop)
+            pointSnap = start
+          }
+        }
+      }
+      return pointSnap
     } catch (error) {
       console.log(error)
     }

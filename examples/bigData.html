@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>geomParser</title>
+  <style type="text/css">
+    .base-textarea {
+      font-size: 10pt;
+      font-family: 'Microsoft Yahei';
+      line-height: normal !important;
+      overflow: auto;
+      vertical-align: top;
+      outline: none;
+      resize: both;
+      height: 200px;
+    }
+  </style>
+</head>
+<body>
+<textarea class="base-textarea left-textarea" id="code"></textarea>
+<textarea class="base-textarea right-textarea" id="encode"></textarea>
+<script src="lib/axios/axios.min.js"></script>
+<script src="../dist/GeomTools.js"></script>
+<script type="text/javascript">
+  axios.get('./data/s41.json')
+    .then(function (response) {
+      var line = response['data']['features'][0];
+      if (line && line['geometry'] && line['geometry']['paths']) {
+        var coords = GeomTools.utils.corverRecurrence(line['geometry']['paths'])
+        var _geoJSON = {
+          properties: {
+            m: true
+          },
+          coordinates: coords,
+          type: 'LineString'
+        }
+        var lrsUtils = new GeomTools.LrsUtils()
+        var mile = lrsUtils.getClosePointFromLinesHasM(coords, [115.50680585701576, 25.803196348616325])
+        console.log(mile)
+        var point = GeomTools.utils.closeDisorderArray(coords, mile['coords'][2], 2)
+        console.log(point)
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+</script>
+</body>
+</html>

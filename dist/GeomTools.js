@@ -617,13 +617,17 @@ module.exports = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.geomEach = exports.flattenEach = exports.distanceToRadians = exports.destination = exports.radiansToDistance = exports.containsNumber = exports.getCoords = exports.getCoord = exports.distance = exports.closeOrderArray = exports.closeDisorderArray = exports.corverRecurrence = undefined;
+exports.getDistance_ = exports.toRadians = exports.geomEach = exports.flattenEach = exports.distanceToRadians = exports.destination = exports.radiansToDistance = exports.containsNumber = exports.getCoords = exports.getCoord = exports.distance = exports.closeOrderArray = exports.closeDisorderArray = exports.corverRecurrence = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _constants = __webpack_require__(11);
 
+var _constants2 = _interopRequireDefault(_constants);
+
 var _geometry = __webpack_require__(5);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var corverRecurrence = exports.corverRecurrence = function corverRecurrence(data) {
   var _data = [];
@@ -631,14 +635,13 @@ var corverRecurrence = exports.corverRecurrence = function corverRecurrence(data
     if (items && Array.isArray(items) && items.length > 0) {
       items.forEach(function (item) {
         if (item && Array.isArray(item) && item.length > 0) {
-          _data.push(item);
+          _data = _data.concat(item);
         } else {
           recurrence(item);
         }
       });
     }
   }
-
   recurrence(data);
   return _data;
 };
@@ -795,7 +798,7 @@ var containsNumber = exports.containsNumber = function containsNumber(coordinate
 
 var radiansToDistance = exports.radiansToDistance = function radiansToDistance(radians, units) {
   if (radians === undefined || radians === null) throw new Error('参数错误');
-  var factor = _constants.factors[units || 'kilometers'];
+  var factor = _constants2.default[units || 'kilometers'];
   if (!factor) throw new Error('单位错误！');
   return radians * factor;
 };
@@ -819,7 +822,7 @@ var distanceToRadians = exports.distanceToRadians = function distanceToRadians(d
   if (distance === undefined || distance === null) {
     throw new Error('距离必须传入！');
   }
-  var factor = _constants.factors[units || 'kilometers'];
+  var factor = _constants2.default[units || 'kilometers'];
   if (!factor) {
     throw new Error('单位错误！');
   }
@@ -912,6 +915,19 @@ var geomEach = exports.geomEach = function geomEach(geojson, callback) {
       }
     }
   }
+};
+
+var toRadians = exports.toRadians = function toRadians(angleInDegrees) {
+  return angleInDegrees * Math.PI / 180;
+};
+
+var getDistance_ = exports.getDistance_ = function getDistance_(c1, c2, radius) {
+  var lat1 = toRadians(c1[1]);
+  var lat2 = toRadians(c2[1]);
+  var deltaLatBy2 = (lat2 - lat1) / 2;
+  var deltaLonBy2 = toRadians(c2[0] - c1[0]) / 2;
+  var a = Math.sin(deltaLatBy2) * Math.sin(deltaLatBy2) + Math.sin(deltaLonBy2) * Math.sin(deltaLonBy2) * Math.cos(lat1) * Math.cos(lat2);
+  return 2 * radius * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
 
 /***/ }),
@@ -2071,7 +2087,7 @@ module.exports = exports['default'];
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-function feature(geometry, properties, bbox, id) {
+var feature = exports.feature = function feature(geometry, properties, bbox, id) {
   if (geometry === undefined) throw new Error('geometry is required');
   if (properties && properties.constructor !== Object) throw new Error('properties must be an Object');
   var feat = {
@@ -2085,9 +2101,9 @@ function feature(geometry, properties, bbox, id) {
   }
   if (id) feat.id = id;
   return feat;
-}
+};
 
-function geometry(type, coordinates, bbox) {
+var geometry = exports.geometry = function geometry(type, coordinates, bbox) {
   if (!type) throw new Error('type is required');
   if (!coordinates) throw new Error('coordinates is required');
   if (!Array.isArray(coordinates)) throw new Error('coordinates must be an Array');
@@ -2119,9 +2135,9 @@ function geometry(type, coordinates, bbox) {
     geom.bbox = bbox;
   }
   return geom;
-}
+};
 
-function point(coordinates, properties, bbox, id) {
+var point = exports.point = function point(coordinates, properties, bbox, id) {
   if (!coordinates) throw new Error('No coordinates passed');
   if (coordinates.length === undefined) throw new Error('Coordinates must be an array');
   if (coordinates.length < 2) throw new Error('Coordinates must be at least 2 numbers long');
@@ -2130,9 +2146,9 @@ function point(coordinates, properties, bbox, id) {
     type: 'Point',
     coordinates: coordinates
   }, properties, bbox, id);
-}
+};
 
-function polygon(coordinates, properties, bbox, id) {
+var polygon = exports.polygon = function polygon(coordinates, properties, bbox, id) {
   if (!coordinates) throw new Error('No coordinates passed');
   for (var i = 0; i < coordinates.length; i++) {
     var ring = coordinates[i];
@@ -2149,18 +2165,18 @@ function polygon(coordinates, properties, bbox, id) {
     type: 'Polygon',
     coordinates: coordinates
   }, properties, bbox, id);
-}
+};
 
-function lineString(coordinates, properties, bbox, id) {
+var lineString = exports.lineString = function lineString(coordinates, properties, bbox, id) {
   if (!coordinates) throw new Error('No coordinates passed');
   if (coordinates.length < 2) throw new Error('Coordinates must be an array of two or more positions');
   return feature({
     type: 'LineString',
     coordinates: coordinates
   }, properties, bbox, id);
-}
+};
 
-function featureCollection(features, bbox) {
+var featureCollection = exports.featureCollection = function featureCollection(features, bbox) {
   if (!features) throw new Error('No features passed');
   if (!Array.isArray(features)) throw new Error('features must be an Array');
   var fc = {
@@ -2169,54 +2185,40 @@ function featureCollection(features, bbox) {
   };
   if (bbox) fc.bbox = bbox;
   return fc;
-}
+};
 
-function multiLineString(coordinates, properties, bbox, id) {
+var multiLineString = exports.multiLineString = function multiLineString(coordinates, properties, bbox, id) {
   if (!coordinates) throw new Error('No coordinates passed');
   return feature({
     type: 'MultiLineString',
     coordinates: coordinates
   }, properties, bbox, id);
-}
+};
 
-function multiPoint(coordinates, properties, bbox, id) {
+var multiPoint = exports.multiPoint = function multiPoint(coordinates, properties, bbox, id) {
   if (!coordinates) throw new Error('No coordinates passed');
   return feature({
     type: 'MultiPoint',
     coordinates: coordinates
   }, properties, bbox, id);
-}
+};
 
-function multiPolygon(coordinates, properties, bbox, id) {
+var multiPolygon = exports.multiPolygon = function multiPolygon(coordinates, properties, bbox, id) {
   if (!coordinates) throw new Error('No coordinates passed');
   return feature({
     type: 'MultiPolygon',
     coordinates: coordinates
   }, properties, bbox, id);
-}
+};
 
-function geometryCollection(geometries, properties, bbox, id) {
+var geometryCollection = exports.geometryCollection = function geometryCollection(geometries, properties, bbox, id) {
   if (!geometries) throw new Error('geometries is required');
   if (!Array.isArray(geometries)) throw new Error('geometries must be an Array');
   return feature({
     type: 'GeometryCollection',
     geometries: geometries
   }, properties, bbox, id);
-}
-
-exports.default = {
-  feature: feature,
-  geometry: geometry,
-  point: point,
-  polygon: polygon,
-  lineString: lineString,
-  featureCollection: featureCollection,
-  multiLineString: multiLineString,
-  multiPoint: multiPoint,
-  multiPolygon: multiPolygon,
-  geometryCollection: geometryCollection
 };
-module.exports = exports['default'];
 
 /***/ }),
 /* 6 */
@@ -2893,11 +2895,23 @@ var _LrsUtils = __webpack_require__(12);
 
 var _LrsUtils2 = _interopRequireDefault(_LrsUtils);
 
+var _utils = __webpack_require__(1);
+
+var utils = _interopRequireWildcard(_utils);
+
+var _geometry = __webpack_require__(5);
+
+var geometry = _interopRequireWildcard(_geometry);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = {
   GeomParser: _GeomParser2.default,
-  LrsUtils: _LrsUtils2.default
+  LrsUtils: _LrsUtils2.default,
+  utils: utils,
+  geometry: geometry
 };
 module.exports = exports['default'];
 
@@ -3158,10 +3172,7 @@ function bbox(coords1, coords2) {
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var factors = exports.factors = {
+module.exports = {
   miles: 3960,
   nauticalmiles: 3441.145,
   degrees: 57.2957795,
@@ -3170,6 +3181,7 @@ var factors = exports.factors = {
   yards: 6969600,
   meters: 6373000,
   metres: 6373000,
+  radius: 6378137,
   centimeters: 6.373e+8,
   centimetres: 6.373e+8,
   kilometers: 6373,
@@ -3200,9 +3212,13 @@ var _lineIntersect = __webpack_require__(9);
 
 var _lineIntersect2 = _interopRequireDefault(_lineIntersect);
 
+var _constants = __webpack_require__(11);
+
+var _constants2 = _interopRequireDefault(_constants);
+
 var _geometry = __webpack_require__(5);
 
-var _geometry2 = _interopRequireDefault(_geometry);
+var geometryUtils = _interopRequireWildcard(_geometry);
 
 var _GeomParser = __webpack_require__(4);
 
@@ -3227,51 +3243,95 @@ var LrsUtils = function () {
         if (type !== 'LineString' && type !== 'MultiLineString') {
           throw new Error('lines must be LineString or MultiLineString');
         }
-        var closestPoint = _geometry2.default.point([Infinity, Infinity], {
+        var closestPoint = geometryUtils.point([Infinity, Infinity], {
           dist: Infinity
         });
         var length = 0.0;
         utils.flattenEach(lines, function (line) {
           var coords = utils.getCoords(line);
           for (var i = 0; i < coords.length - 1; i++) {
-            var start = _geometry2.default.point(coords[i]);
-            start.properties.dist = utils.distance(point, start, units);
+            if (coords[i].length < 3) {
+              continue;
+            } else {
+              var start = geometryUtils.point(coords[i]);
+              start.properties.dist = utils.distance(point, start, units);
 
-            var stop = _geometry2.default.point(coords[i + 1]);
-            stop.properties.dist = utils.distance(point, stop, units);
+              var stop = geometryUtils.point(coords[i + 1]);
+              stop.properties.dist = utils.distance(point, stop, units);
 
-            var sectionLength = utils.distance(start, stop, units);
+              var sectionLength = utils.distance(start, stop, units);
 
-            var heightDistance = Math.max(start.properties.dist, stop.properties.dist);
-            var direction = (0, _bearing.bearing)(start, stop);
-            var perpendicularPt1 = utils.destination(point, heightDistance, direction + 90, units);
-            var perpendicularPt2 = utils.destination(point, heightDistance, direction - 90, units);
-            var intersect = (0, _lineIntersect2.default)(_geometry2.default.lineString([perpendicularPt1.geometry.coordinates, perpendicularPt2.geometry.coordinates]), _geometry2.default.lineString([start.geometry.coordinates, stop.geometry.coordinates]));
-            var intersectPt = null;
-            if (intersect.features.length > 0) {
-              intersectPt = intersect.features[0];
-              intersectPt.properties.dist = utils.distance(point, intersectPt, units);
-              intersectPt.properties.location = length + utils.distance(start, intersectPt, units);
-            }
-            if (start.properties.dist < closestPoint.properties.dist) {
-              closestPoint = start;
-              closestPoint.properties.index = i;
-              closestPoint.properties.location = length;
-            }
-            if (stop.properties.dist < closestPoint.properties.dist) {
-              closestPoint = stop;
-              closestPoint.properties.index = i + 1;
-              closestPoint.properties.location = length + sectionLength;
-            }
-            if (intersectPt && intersectPt.properties.dist < closestPoint.properties.dist) {
-              closestPoint = intersectPt;
-              closestPoint.properties.index = i;
-            }
+              var heightDistance = Math.max(start.properties.dist, stop.properties.dist);
+              var direction = (0, _bearing.bearing)(start, stop);
+              var perpendicularPt1 = utils.destination(point, heightDistance, direction + 90, units);
+              var perpendicularPt2 = utils.destination(point, heightDistance, direction - 90, units);
+              var intersect = (0, _lineIntersect2.default)(geometryUtils.lineString([perpendicularPt1.geometry.coordinates, perpendicularPt2.geometry.coordinates]), geometryUtils.lineString([start.geometry.coordinates, stop.geometry.coordinates]));
+              var intersectPt = null;
+              if (intersect.features.length > 0) {
+                intersectPt = intersect.features[0];
+                intersectPt.properties.dist = utils.distance(point, intersectPt, units);
+                intersectPt.properties.location = length + utils.distance(start, intersectPt, units);
+              }
+              if (start.properties.dist < closestPoint.properties.dist) {
+                closestPoint = start;
+                closestPoint.properties.index = i;
+                closestPoint.properties.location = length;
+              }
+              if (stop.properties.dist < closestPoint.properties.dist) {
+                closestPoint = stop;
+                closestPoint.properties.index = i + 1;
+                closestPoint.properties.location = length + sectionLength;
+              }
+              if (intersectPt && intersectPt.properties.dist < closestPoint.properties.dist) {
+                closestPoint = intersectPt;
+                closestPoint.properties.index = i;
+              }
 
-            length += sectionLength;
+              length += sectionLength;
+            }
           }
         });
         return closestPoint;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }, {
+    key: 'getClosePointFromLinesHasM',
+    value: function getClosePointFromLinesHasM(lines, point, epsg) {
+      try {
+        var pointSnap = null;
+        if (Array.isArray(lines) && lines.length > 0) {
+          var start = {
+            dist: Infinity,
+            index: Infinity
+          },
+              stop = {};
+
+          for (var i = 0; i < lines.length - 1; i++) {
+            if (lines[i].length < 3) {
+              continue;
+            } else {
+              var corver_ = function corver_(_start, _stop) {
+                if (_start['dist'] < _stop['dist']) {
+                  _start = JSON.stringify(_start);
+                } else {
+                  _start = JSON.stringify(_stop);
+                }
+                return JSON.parse(_start);
+              };
+
+              var dist = utils.getDistance_(point, lines[i], _constants2.default['radius']);
+              stop['dist'] = dist;
+              stop['coords'] = lines[i];
+              stop['index'] = i;
+
+              start = corver_(start, stop);
+              pointSnap = start;
+            }
+          }
+        }
+        return pointSnap;
       } catch (error) {
         console.log(error);
       }
@@ -3294,7 +3354,7 @@ var LrsUtils = function () {
       try {
         if (typeof lines === 'string' && (lines.indexOf('LINESTRING') >= 0 || lines.indexOf('MULTILINESTRING')) >= 0) {
           var _gLines = new _GeomParser2.default().wkt2GeoJSON(lines);
-          return this.getClosePointFromLines(_gLines, _geometry2.default.point(coordinates), 'miles');
+          return this.getClosePointFromLines(_gLines, geometryUtils.point(coordinates), 'miles');
         }
       } catch (error) {
         console.log(error);

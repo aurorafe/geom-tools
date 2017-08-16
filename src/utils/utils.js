@@ -1,7 +1,7 @@
 /**
  * Created by FDD on 2017/8/4.
  */
-import {factors} from '../constants'
+import factors from '../constants'
 import { feature, point } from './geometry'
 /**
  * 递归（注意防止内存溢出，多层数据）
@@ -14,14 +14,13 @@ export const corverRecurrence = (data) => {
     if (items && Array.isArray(items) && items.length > 0) {
       items.forEach(function (item) {
         if (item && Array.isArray(item) && item.length > 0) {
-          _data.push(item)
+          _data = _data.concat(item)
         } else {
           recurrence(item)
         }
       })
     }
   }
-
   recurrence(data)
   return _data
 }
@@ -372,4 +371,32 @@ export const geomEach = (geojson, callback) => {
       }
     }
   }
+}
+
+/**
+ * 转换为弧度
+ * @param angleInDegrees
+ * @returns {number}
+ */
+export const toRadians = (angleInDegrees) => {
+  return angleInDegrees * Math.PI / 180
+}
+
+/**
+ * 获取两个坐标之间距离
+ * @param c1
+ * @param c2
+ * @param radius
+ * @returns {number}
+ * @private
+ */
+export const getDistance_ = (c1, c2, radius) => {
+  let lat1 = toRadians(c1[1])
+  let lat2 = toRadians(c2[1])
+  let deltaLatBy2 = (lat2 - lat1) / 2
+  let deltaLonBy2 = toRadians(c2[0] - c1[0]) / 2;
+  let a = Math.sin(deltaLatBy2) * Math.sin(deltaLatBy2) +
+    Math.sin(deltaLonBy2) * Math.sin(deltaLonBy2) *
+    Math.cos(lat1) * Math.cos(lat2)
+  return (2 * radius * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)))
 }

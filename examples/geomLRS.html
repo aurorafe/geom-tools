@@ -22,9 +22,20 @@
 <script src="../dist/GeomTools.js"></script>
 <script type="text/javascript">
   var lrsUtils = new GeomTools.LrsUtils()
-  var mile = lrsUtils.getMileageByPoint('MULTILINESTRING M ((115.873075148 26.383782945000007 0, 115.573075148 26.083782945000007 30, 114.573075148 25.083782945000007 60))', [115.563075148, 26.083782945000007])
+  var _geoJSON = {
+    properties: {
+      m: true
+    },
+    coordinates: [
+      [115.873075148, 26.383782945000007, 0], [115.573075148, 26.083782945000007, 30], [114.573075148, 25.083782945000007, 60]
+    ],
+    type: 'LineString'
+  }
+  var mile = lrsUtils.getClosePointFromLinesHasM(_geoJSON['coordinates'], [115.873075148, 26.383782945000007])
   console.log(mile)
-  var point = lrsUtils.getPointByMileage('MULTILINESTRING M ((115.873075148 26.383782945000007 0, 115.573075148 26.083782945000007 30, 114.573075148 25.083782945000007 60))', 24)
+//  var mile = lrsUtils.getClosePointFromLines(_geoJSON, GeomTools.geometry.point([115.563075148, 26.083782945000007]), 'miles')
+//  console.log(mile)
+  var point = lrsUtils.getPointByMileage('LINESTRING M (115.873075148 26.383782945000007 0, 115.573075148 26.083782945000007 30, 114.573075148 25.083782945000007 60)', 24)
   console.log(point)
 </script>
 </body>
