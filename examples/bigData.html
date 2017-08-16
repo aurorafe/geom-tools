@@ -27,13 +27,6 @@
       var line = response['data']['features'][0];
       if (line && line['geometry'] && line['geometry']['paths']) {
         var coords = GeomTools.utils.corverRecurrence(line['geometry']['paths'])
-        var _geoJSON = {
-          properties: {
-            m: true
-          },
-          coordinates: coords,
-          type: 'LineString'
-        }
         var lrsUtils = new GeomTools.LrsUtils()
         var mile = lrsUtils.getClosePointFromLinesHasM(coords, [115.50680585701576, 25.803196348616325])
         console.log(mile)
