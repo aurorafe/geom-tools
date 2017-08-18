@@ -8,7 +8,7 @@ import { feature, point } from './geometry'
  * @param data
  * @returns {Array}
  */
-export const corverRecurrence = (data) => {
+export const corverRecurrence = data => {
   let _data = []
   function recurrence (items) {
     if (items && Array.isArray(items) && items.length > 0) {
@@ -158,7 +158,7 @@ export const distance = (from, to, units) => {
  * 获取坐标
  * @param obj
  */
-export const getCoord = (obj) => {
+export const getCoord = obj => {
   if (!obj) throw new Error('obj is required')
   let coordinates = getCoords(obj)
   if (coordinates.length > 1 &&
@@ -175,7 +175,7 @@ export const getCoord = (obj) => {
  * @param obj
  * @returns {*}
  */
-export const getCoords = (obj) => {
+export const getCoords = obj => {
   if (!obj) throw new Error('obj is required')
   let coordinates
   // Array of numbers
@@ -201,7 +201,7 @@ export const getCoords = (obj) => {
  * @param coordinates
  * @returns {boolean}
  */
-export const containsNumber = (coordinates) => {
+export const containsNumber = coordinates => {
   if (coordinates.length > 1 &&
     typeof coordinates[0] === 'number' &&
     typeof coordinates[1] === 'number') {

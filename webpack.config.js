@@ -7,7 +7,6 @@ const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 const env = require('yargs').argv.env // use --env with webpack 2
 let libraryName = 'GeomTools'
-
 const resolve = (dir) => {
   return path.join(__dirname, './', dir)
 }
@@ -70,7 +69,7 @@ const config = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: [resolve('src'), resolve('test'), resolve('node_modules')]
+        include: [resolve('src'), resolve('test')]
       }
     ]
   },
