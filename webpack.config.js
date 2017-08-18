@@ -9,7 +9,7 @@ const env = require('yargs').argv.env // use --env with webpack 2
 let libraryName = 'GeomTools'
 
 const resolve = (dir) => {
-  return path.join(__dirname, '..', dir)
+  return path.join(__dirname, './', dir)
 }
 
 let plugins = [
@@ -44,9 +44,7 @@ if (env === 'build') {
 }
 
 const config = {
-  entry: [
-    path.resolve(__dirname + '/src/index.js')
-  ],
+  entry: './src/index.js',
   // devtool: '#cheap-module-eval-source-map',
   // devtool: '#eval-source-map',
   devtool: '#source-map',
@@ -62,12 +60,17 @@ const config = {
     rules: [
       {
         test: /(\.js)$/,
-        enforce: 'pre',  // 在babel-loader对源码进行编译前进行lint的检查
-        loaders: [
-          // 'eslint-loader',
-          'babel-loader'
-        ],
-        exclude: /(node_modules|bower_components)/
+        enforce: 'pre',
+        loader: 'eslint-loader', // 在babel-loader对源码进行编译前进行lint的检查
+        include: [resolve('src'), resolve('test')],
+        options: {
+          formatter: require('eslint-friendly-formatter')
+        }
+      },
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        include: [resolve('src'), resolve('test'), resolve('node_modules')]
       }
     ]
   },

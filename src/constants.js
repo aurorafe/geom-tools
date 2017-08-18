@@ -17,5 +17,4 @@ module.exports = {
   kilometers: 6373,
   kilometres: 6373,
   feet: 20908792.65
-};
-
+}

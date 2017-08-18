@@ -47,8 +47,7 @@ class LrsUtils {
             let perpendicularPt1 = utils.destination(point, heightDistance, direction + 90, units)
             let perpendicularPt2 = utils.destination(point, heightDistance, direction - 90, units)
             let intersect = lineIntersects(geometryUtils.lineString([perpendicularPt1.geometry.coordinates,
-              perpendicularPt2.geometry.coordinates]), geometryUtils.lineString([start.geometry.coordinates,
-              stop.geometry.coordinates]))
+              perpendicularPt2.geometry.coordinates]), geometryUtils.lineString([start.geometry.coordinates, stop.geometry.coordinates]))
             let intersectPt = null
             if (intersect.features.length > 0) {
               intersectPt = intersect.features[0]
@@ -104,7 +103,7 @@ class LrsUtils {
             stop['dist'] = dist
             stop['coords'] = lines[i]
             stop['index'] = i
-            function corver_ (_start, _stop) {
+            let corver_ = function (_start, _stop) {
               if (_start['dist'] < _stop['dist']) {
                 _start = JSON.stringify(_start)
               } else {

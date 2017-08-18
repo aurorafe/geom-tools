@@ -394,7 +394,7 @@ export const getDistance_ = (c1, c2, radius) => {
   let lat1 = toRadians(c1[1])
   let lat2 = toRadians(c2[1])
   let deltaLatBy2 = (lat2 - lat1) / 2
-  let deltaLonBy2 = toRadians(c2[0] - c1[0]) / 2;
+  let deltaLonBy2 = toRadians(c2[0] - c1[0]) / 2
   let a = Math.sin(deltaLatBy2) * Math.sin(deltaLatBy2) +
     Math.sin(deltaLonBy2) * Math.sin(deltaLonBy2) *
     Math.cos(lat1) * Math.cos(lat2)
